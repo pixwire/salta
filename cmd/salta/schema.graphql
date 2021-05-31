@@ -1,0 +1,24 @@
+
+type Location {
+	campus: String
+	locality: String
+	marketArea: String
+	neighbourhood: String
+	borough: String
+	microhood: String
+	county: String
+	macroCounty: String
+	localAdmin: String
+	region: String
+	macroRegion: String
+	country: String
+}
+
+input LocationFromLatLngInput {
+    latitude: Float!
+    longitude: Float! 
+}
+
+type Query {
+    locationFromLatLng(input: LocationFromLatLngInput!): Location
+}
