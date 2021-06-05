@@ -18,8 +18,8 @@ func main() {
 	}
 
 	viper.SetDefault("port", 8080)
-	viper.SetDefault("repos_folder", "repos")
-	viper.SetDefault("cache_folder", "cache")
+	viper.SetDefault("repos.folder", "repos")
+	viper.SetDefault("cache.folder", "cache")
 
 	viper.SetConfigFile(os.Args[1])
 	if err := viper.ReadInConfig(); err != nil {
@@ -28,8 +28,8 @@ func main() {
 
 	countries := viper.GetStringSlice("countries")
 	enabledPlaceTypes := viper.GetStringSlice("enabled_place_types")
-	reposFolder := viper.GetString("repos_folder")
-	cacheFolder := viper.GetString("cache_folder")
+	reposFolder := viper.GetString("repos.folder")
+	cacheFolder := viper.GetString("cache.folder")
 	port := viper.GetInt("port")
 
 	g := geocoding.NewReverseGeocoder(reposFolder, cacheFolder, countries, enabledPlaceTypes)
