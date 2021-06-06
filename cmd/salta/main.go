@@ -20,6 +20,20 @@ func main() {
 	viper.SetDefault("port", 8080)
 	viper.SetDefault("repos.folder", "repos")
 	viper.SetDefault("cache.folder", "cache")
+	viper.SetDefault("enabled_place_types", []string{
+		"locality",
+		"neighbourhood",
+		"borough",
+		"microhood",
+		"county",
+		"macrocounty",
+		"localadmin",
+		"region",
+		"macroregion",
+		"country",
+		"campus",
+		"marketarea",
+	})
 
 	viper.SetConfigFile(os.Args[1])
 	if err := viper.ReadInConfig(); err != nil {
