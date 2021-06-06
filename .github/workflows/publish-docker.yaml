@@ -18,7 +18,7 @@ jobs:
     - name: Build
       run: |
         cd cmd/salta
-        GO_ENABLED=0 go build
+        CGO_ENABLED=0 go build
 
     -
        name: Set up QEMU
