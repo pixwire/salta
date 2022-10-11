@@ -67,5 +67,11 @@ Supported formats: JSON, YAML.
 #### With Docker
 
 ```sh
-docker run -v $PWD/config.yaml:/config.yaml -t ghcr.io/ackar/salta:latest
+docker run -v $PWD/config.yaml:/config.yaml -t ghcr.io/pixwire/salta:latest
 ```
+
+## Used by
+
+Salta was created for use in [Pixwire](https://pixwire.net).
+
+<a href="https://pixwire.net"><img src="https://raw.githubusercontent.com/pixwire/.github/main/pixwire-gopher.jpg" width="60%" /></a>
