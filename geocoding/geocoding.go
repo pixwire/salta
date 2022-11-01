@@ -375,6 +375,9 @@ func (g *ReverseGeocoder) processGeojson(country, path string) ([]*placePolygon,
 	if !ok || placeType == "" {
 		return nil, g.cacheInvalid(country, path)
 	}
+	if !g.placeTypeEnabled(placeType) {
+		return nil, nil
+	}
 
 	if !feature.Geometry.IsPolygon() && !feature.Geometry.IsMultiPolygon() {
 		return nil, g.cacheInvalid(country, path)
