@@ -20,20 +20,9 @@ func main() {
 	viper.SetDefault("port", 8080)
 	viper.SetDefault("repos.folder", "repos")
 	viper.SetDefault("cache.folder", "cache")
-	viper.SetDefault("enabled_place_types", []string{
-		"locality",
-		"neighbourhood",
-		"borough",
-		"microhood",
-		"county",
-		"macrocounty",
-		"localadmin",
-		"region",
-		"macroregion",
-		"country",
-		"campus",
-		"marketarea",
-	})
+	viper.SetDefault("enabled_place_types", placeTypes)
+	viper.SetDefault("countries", allCountries)
+	viper.SetDefault("cache_only", false)
 
 	viper.SetConfigFile(os.Args[1])
 	if err := viper.ReadInConfig(); err != nil {
@@ -45,11 +34,21 @@ func main() {
 	reposFolder := viper.GetString("repos.folder")
 	cacheFolder := viper.GetString("cache.folder")
 	port := viper.GetInt("port")
+	cacheOnly := viper.GetBool("cache_only")
 
 	g := geocoding.NewReverseGeocoder(reposFolder, cacheFolder, countries, enabledPlaceTypes)
-	err := g.Init()
-	if err != nil {
-		log.WithError(err).Fatal("error initializing geocoder")
+
+	if cacheOnly {
+		log.Info("using cache only")
+		err := g.LoadCachedFiles()
+		if err != nil {
+			log.WithError(err).Fatal("error initializing geocoder from cached files")
+		}
+	} else {
+		err := g.UpdateAndLoad()
+		if err != nil {
+			log.WithError(err).Fatal("error initializing geocoder")
+		}
 	}
 
 	r := newGraphqlResolver(g)

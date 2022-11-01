@@ -38,7 +38,10 @@ On subsequent launches cached files are used when the source hasn't changed.
 Sample config file:
 
 ```yaml
-countries: # default: none
+# In cache only mode Salta only loads the available cache files. This makes
+# start-up significantly faster.
+cache_only: true # default: false
+countries: # default: all countries
   - nz
   - fr
 cache:

@@ -144,16 +144,57 @@ func (g *ReverseGeocoder) LocationFromLatLng(lat, lng float64) *Location {
 	return &res
 }
 
-// Init loads the data into the index.
+// UpdateAndLoad loads the data into the index.
 // It first clones and updates the countries repositories, and the process all
 // available geojson, using the cache when available.
-func (g *ReverseGeocoder) Init() error {
+func (g *ReverseGeocoder) UpdateAndLoad() error {
 	for _, c := range g.countries {
 		err := g.loadCountry(c)
 		if err != nil {
 			return fmt.Errorf("error loading country %q: %w", c, err)
 		}
 	}
+	return nil
+}
+
+// LoadCachedFiles loads files from the cache folder.
+// The cache should already be populated.
+func (g *ReverseGeocoder) LoadCachedFiles() error {
+	for _, country := range g.countries {
+		err := filepath.Walk(g.cachePath(country), func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !strings.HasSuffix(path, ".geojson") {
+				return nil
+			}
+
+			b, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			var cache cachedFile
+			err = json.Unmarshal(b, &cache)
+			if err != nil {
+				return err
+			}
+			if !g.placeTypeEnabled(cache.Place.PlaceType) {
+				return nil
+			}
+
+			for _, p := range cache.PlacePolygons() {
+				g.index.Add(p)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return fmt.Errorf("error loading %q: %w", country, err)
+		}
+		log.WithField("country", country).Info("loaded country cache")
+	}
+
 	return nil
 }
 
@@ -467,7 +508,7 @@ func (g *ReverseGeocoder) createReposFolder() error {
 }
 
 func (g *ReverseGeocoder) createCacheFolder(country string) error {
-	err := os.MkdirAll(fmt.Sprintf("%s/%s", g.cacheFolder, country), 0755)
+	err := os.MkdirAll(g.cachePath(country), 0755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -496,6 +537,10 @@ func (g *ReverseGeocoder) writeCache(country, path string, cache *cachedFile) er
 	return json.NewEncoder(f).Encode(cache)
 }
 
+func (g *ReverseGeocoder) cachePath(country string) string {
+	return fmt.Sprintf("%s/%s", g.cacheFolder, country)
+}
+
 func (g *ReverseGeocoder) repoPath(country string) string {
 	return fmt.Sprintf("%s/%s", g.reposFolder, country)
 }
@@ -516,19 +561,6 @@ func (g *ReverseGeocoder) placeTypeEnabled(placetype string) bool {
 		}
 	}
 	return false
-}
-
-func rectToPolygon(r s2.Rect) *s2.Polygon {
-	var pts []s2.Point
-
-	pts = append(pts, s2.PointFromLatLng(s2.LatLng{Lat: r.Lo().Lat, Lng: r.Lo().Lng}))
-	pts = append(pts, s2.PointFromLatLng(s2.LatLng{Lat: r.Lo().Lat, Lng: r.Hi().Lng}))
-	pts = append(pts, s2.PointFromLatLng(s2.LatLng{Lat: r.Hi().Lat, Lng: r.Hi().Lng}))
-	pts = append(pts, s2.PointFromLatLng(s2.LatLng{Lat: r.Hi().Lat, Lng: r.Lo().Lng}))
-
-	loop := s2.LoopFromPoints(pts)
-
-	return s2.PolygonFromLoops([]*s2.Loop{loop})
 }
 
 func toLoop(points [][]float64) *s2.Loop {
