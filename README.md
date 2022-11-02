@@ -86,6 +86,11 @@ Supported formats: JSON, YAML.
 docker run -v $PWD/config.yaml:/config.yaml -t ghcr.io/pixwire/salta:latest
 ```
 
+## License
+
+Who's on first data requires linking back to their license.
+See the [Who's on first license](https://whosonfirst.org/docs/licenses/) for more information.
+
 ## Used by
 
 Salta was created for use in [Pixwire](https://pixwire.net).
