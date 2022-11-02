@@ -21,15 +21,28 @@ In order to optimize memory usage, on the first launch Salta simplifies polygons
 and stores a cached version of every processed geojson.
 On subsequent launches cached files are used when the source hasn't changed.
 
-| Country       | Load time (with cache) | Initial load time (no cache) | Memory usage\* | Total disk usage (repo/cache) |
-| ------------- | ---------------------- | ---------------------------- | -------------- | ----------------------------- |
-| New Zealand   | 1s                     | 4mn                          | 23MB           | 791MB (738MB/53MB)            |
-| France        | 3s                     | 3mn                          | 152MB          | 4GB (2.9G/914MB)              |
-| United States | 6s                     | 15mn                         | 259MB          | 8.6GB (6.8GB/1.8GB)           |
+| Country       | Load time (with cache) | Initial load time (no cache) | Memory usage | Total disk usage (repo/cache) |
+| ------------- | ---------------------- | ---------------------------- | ------------ | ----------------------------- |
+| New Zealand   | 1s                     | 4mn                          | 23MB         | 791MB (738MB/53MB)            |
+| France        | 3s                     | 3mn                          | 152MB        | 4GB (2.9G/914MB)              |
+| United States | 6s                     | 15mn                         | 259MB        | 8.6GB (6.8GB/1.8GB)           |
 
-(SSD drive, AMD Ryzen 3700X)
+*Loading all place types. Memory usage after GC. SSD drive, AMD Ryzen 3700X.*
 
-\* Loading all place types. Memory usage after GC.
+When using the **cache only mode** the initial load time can be significantly faster, when loading the **whole world** is takes:
+- A few seconds to load countries and localities
+- Around five minutes to load all place types
+
+In terms of **memory usage for loading the whole world**, depending on the place types loaded:
+
+| Place type                       | Memory usage |
+| -------------------------------- | ------------ |
+| Countries                        | 73MB         |
+| Countries + Localities           | 512MB        |
+| Countries + Regions + Localities | 818MB        |
+| All                              | 1.3GB        |
+
+The **mean response time for HTTP requests** is around 200-300μs.
 
 ## Usage
 
